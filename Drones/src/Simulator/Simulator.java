@@ -14,17 +14,14 @@
  */
 package Simulator;
 
-import java.io.File;
+import Drone.Drone;
+import Utils.Mesh;
 import java.io.FileNotFoundException;
-import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.input.Mouse;
-import org.lwjgl.BufferUtils;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Scanner;
 import static org.lwjgl.util.glu.GLU.*;
 import static org.lwjgl.opengl.GL11.*;
 
@@ -54,22 +51,29 @@ public class Simulator {
     // camera positition
     private static float cameraAzimuth = 37.5f;
     private static float cameraElevation = -30.0f;
-    private static float cameraDistance = 6.0f;
+    private static float cameraDistance = 10.0f;
 
-    // Mesh
+    // Meshes for obstacles
+    ArrayList<Mesh> obstacles;
+    
+    Drone me;
 
-
+    //The bounding volume
+    Mesh bounds;
+    
     // Which rendering mode do we have
     private static boolean renderWire = false;
     private static boolean renderSmooth = false;
 
     // no constructor needed - this class is static
     public Simulator() {
+        bounds = new Mesh("/home/awells/NetBeansProjects/DroneSeniorDesign2015/Drones/assets/room.obj");
+        me = new Drone(new Mesh("/home/awells/NetBeansProjects/DroneSeniorDesign2015/Drones/assets/quadrotor.obj"), 3.0f, 1.0f, 1.0f);
     }
 
 
     // Initialize display and opengl properties.
-    private static void init() throws Exception {
+    public void init() throws Exception {
 
         // initialize the display
         Display.setTitle(APP_TITLE);
@@ -117,7 +121,7 @@ public class Simulator {
     }
 
     // Main loop.
-    public static void run() throws FileNotFoundException {
+    public void run() throws FileNotFoundException {
 
         while (!finished) {
 
@@ -130,7 +134,7 @@ public class Simulator {
             } else if (Display.isActive()) {
 
                 // The window is in the foreground, so we should play the game
-                logic();
+                //logic();
                 render();
                 renderCoordinateFrame();
                 Display.sync(FRAMERATE);
@@ -156,7 +160,7 @@ public class Simulator {
     }
 
     // Clean up before exit.
-    private static void cleanup() {
+    private void cleanup() {
 
         // Close the window
         Display.destroy();
@@ -164,7 +168,7 @@ public class Simulator {
     }
 
     // Handle input.
-    private static void logic() {
+    private void logic() {
 
         // escape to quit
         if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
@@ -197,7 +201,7 @@ public class Simulator {
     }
 
     // Render model from current view.
-    private static void render() {
+    private void render() {
 
         // clear the screen and depth buffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -222,7 +226,10 @@ public class Simulator {
         // Scale to 25 since scaling to 1 causes weird results for the color or lighting or something.
 
         //renderMesh();
-        //renderCoordinateFrame();
+        renderCoordinateFrame();
+        renderBounds();
+        renderObstacles();
+        renderMyself();
 
         // pop out of object space and back into camera space
         glPopMatrix();
@@ -233,10 +240,21 @@ public class Simulator {
         // flush the data
         glFlush();
     }
+    
+    private void renderBounds() {
+        renderMesh(bounds, true, false);
+    }
+    
+    private void renderObstacles() {
+        
+        
+    }
+    
+    private void renderMyself() {
+        renderMesh(me.mesh, false, false);        
+    }
 
-    /*
-    // Render a mesh.
-    private static void renderMesh() {
+    private void renderMesh(Mesh mg, boolean renderWire, boolean renderSmooth) {
 
         if (!renderWire && !renderSmooth) {
 
@@ -246,11 +264,8 @@ public class Simulator {
             // draw triangles
             glBegin(GL_TRIANGLES);
 
-            float denom = mg.maxPairDist - mg.minPairDist;
-
             for (int i = 0; i < mg.f.length; i++) {
-                float intensity = (mg.faceAvgPairDistance[i] - mg.minPairDist) / denom;
-                glColor3f(intensity, 1 - intensity, 0.5f);
+                glColor3f(1.0f, 0.0f, 1.0f);
 
                 glNormal3f(mg.nf[i][0] / mg.diagLength, mg.nf[i][1] / mg.diagLength, mg.nf[i][2] / mg.diagLength);
                 glVertex3f(mg.v[mg.f[i][0]][0], mg.v[mg.f[i][0]][1], mg.v[mg.f[i][0]][2]);
@@ -298,7 +313,6 @@ public class Simulator {
 
         }
     }
-    */
 
     // Render the basis vectors of the coordinate frame: x (red), y (blue), and
     // z (green). Can be useful for debugging purposes. 

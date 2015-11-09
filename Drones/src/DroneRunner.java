@@ -21,7 +21,9 @@ public class DroneRunner {
         
         System.out.println("YO");
         
-        new Simulator().run();
+        Simulator sim = new Simulator();
+        sim.init();
+        sim.run();
         } catch (Exception e) {
             System.out.println(e.toString());
         }
