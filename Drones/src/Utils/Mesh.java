@@ -43,6 +43,10 @@ public class Mesh {
 
     public int[] colorGroups;
     public float[][] colors;
+    
+    public float x_offset;
+    public float y_offset;
+    public float z_offset;
 
     public Mesh(String s) {
         try {

@@ -28,7 +28,7 @@ import static org.lwjgl.opengl.GL11.*;
 public class Simulator {
 
     // window title
-    public static final String APP_TITLE = "Mesh Viewer";
+    public static final String APP_TITLE = "Drone Simulator";
 
     // desired frame rate
     private static final int FRAMERATE = 60;
@@ -49,18 +49,18 @@ public class Simulator {
     private static boolean finished;
 
     // camera positition
-    private static float cameraAzimuth = 37.5f;
-    private static float cameraElevation = -30.0f;
-    private static float cameraDistance = 10.0f;
+    private static float cameraAzimuth = 30.5f;
+    private static float cameraElevation = -15.0f;
+    private static float cameraDistance = 15.0f;
 
     // Meshes for obstacles
-    ArrayList<Mesh> obstacles;
-    
+    ArrayList<Mesh> obstacles = new ArrayList<Mesh>();
+
     Drone me;
 
     //The bounding volume
     Mesh bounds;
-    
+
     // Which rendering mode do we have
     private static boolean renderWire = false;
     private static boolean renderSmooth = false;
@@ -68,9 +68,20 @@ public class Simulator {
     // no constructor needed - this class is static
     public Simulator() {
         bounds = new Mesh("/home/awells/NetBeansProjects/DroneSeniorDesign2015/Drones/assets/room.obj");
+        bounds.x_offset = -10.5f;
+        bounds.y_offset = -2.5f;
+        bounds.z_offset = -10.5f;
         me = new Drone(new Mesh("/home/awells/NetBeansProjects/DroneSeniorDesign2015/Drones/assets/quadrotor.obj"), 3.0f, 1.0f, 1.0f);
-    }
+        me.mesh.x_offset = 3f;
+        me.mesh.y_offset = 2f;
+        me.mesh.z_offset = 7f;
 
+        Mesh o = new Mesh("/home/awells/NetBeansProjects/DroneSeniorDesign2015/Drones/assets/cube.obj");
+        o.x_offset = 1f;
+        o.y_offset = 0f;
+        o.z_offset = 3f;
+        obstacles.add(o);
+    }
 
     // Initialize display and opengl properties.
     public void init() throws Exception {
@@ -224,7 +235,6 @@ public class Simulator {
         glColor3f(1.0f, 0.0f, 0.0f);
 
         // Scale to 25 since scaling to 1 causes weird results for the color or lighting or something.
-
         //renderMesh();
         renderCoordinateFrame();
         renderBounds();
@@ -240,47 +250,54 @@ public class Simulator {
         // flush the data
         glFlush();
     }
-    
+
     private void renderBounds() {
-        renderMesh(bounds, true, false);
-    }
-    
-    private void renderObstacles() {
-        
-        
-    }
-    
-    private void renderMyself() {
-        renderMesh(me.mesh, false, false);        
+        renderMesh(bounds, true, false, new float[] {0f, 0f, 0f});
     }
 
-    private void renderMesh(Mesh mg, boolean renderWire, boolean renderSmooth) {
+    private void renderObstacles() {
+        for (Mesh m : obstacles) {
+            renderMesh(m, false, false, new float[] {0f, 1f, 0f});
+        }
+    }
+
+    private void renderMyself() {
+        renderMesh(me.mesh, false, false, new float[] {0f, 0f, 1f});
+    }
+
+    private void renderMesh(Mesh mg, boolean renderWire, boolean renderSmooth, float[] color) {
+
+        glColor3f(color[0], color[1], color[2]);
 
         if (!renderWire && !renderSmooth) {
 
             // set flat shading 
             glShadeModel(GL_FLAT);
 
+            glTranslatef(mg.x_offset, mg.y_offset, mg.z_offset);
+            glPushMatrix();
+
             // draw triangles
             glBegin(GL_TRIANGLES);
 
             for (int i = 0; i < mg.f.length; i++) {
-                glColor3f(1.0f, 0.0f, 1.0f);
-
                 glNormal3f(mg.nf[i][0] / mg.diagLength, mg.nf[i][1] / mg.diagLength, mg.nf[i][2] / mg.diagLength);
                 glVertex3f(mg.v[mg.f[i][0]][0], mg.v[mg.f[i][0]][1], mg.v[mg.f[i][0]][2]);
                 glVertex3f(mg.v[mg.f[i][1]][0], mg.v[mg.f[i][1]][1], mg.v[mg.f[i][1]][2]);
                 glVertex3f(mg.v[mg.f[i][2]][0], mg.v[mg.f[i][2]][1], mg.v[mg.f[i][2]][2]);
             }
+
             glEnd();
+            glPopMatrix();
         } else if (renderWire) {
 
             // set smooth shading 
             glShadeModel(GL_SMOOTH);
 
+            glTranslatef(mg.x_offset, mg.y_offset, mg.z_offset);
+            glPushMatrix();
             // draw lines
             glBegin(GL_LINES);
-
             for (int i = 0; i < mg.f.length; i++) {
                 glNormal3f(mg.nv[mg.f[i][0]][0] / mg.diagLength, mg.nv[mg.f[i][0]][1] / mg.diagLength, mg.nv[mg.f[i][0]][2] / mg.diagLength);
                 glVertex3f(mg.v[mg.f[i][0]][0], mg.v[mg.f[i][0]][1], mg.v[mg.f[i][0]][2]);
@@ -296,11 +313,16 @@ public class Simulator {
                 glVertex3f(mg.v[mg.f[i][0]][0], mg.v[mg.f[i][0]][1], mg.v[mg.f[i][0]][2]);
             }
             glEnd();
+            glPopMatrix();
         } else {
             // set smooth shading 
             glShadeModel(GL_SMOOTH);
 
+            glTranslatef(mg.x_offset, mg.y_offset, mg.z_offset);
+            glPushMatrix();
+
             glBegin(GL_TRIANGLES);
+            glLoadIdentity();
             for (int i = 0; i < mg.f.length; i++) {
                 glNormal3f(mg.nv[mg.f[i][0]][0] / mg.diagLength, mg.nv[mg.f[i][0]][1] / mg.diagLength, mg.nv[mg.f[i][0]][2] / mg.diagLength);
                 glVertex3f(mg.v[mg.f[i][0]][0], mg.v[mg.f[i][0]][1], mg.v[mg.f[i][0]][2]);
@@ -309,8 +331,9 @@ public class Simulator {
                 glNormal3f(mg.nv[mg.f[i][2]][0] / mg.diagLength, mg.nv[mg.f[i][2]][1] / mg.diagLength, mg.nv[mg.f[i][2]][2] / mg.diagLength);
                 glVertex3f(mg.v[mg.f[i][2]][0], mg.v[mg.f[i][2]][1], mg.v[mg.f[i][2]][2]);
             }
-            glEnd();
 
+            glEnd();
+            glPopMatrix();
         }
     }
 
