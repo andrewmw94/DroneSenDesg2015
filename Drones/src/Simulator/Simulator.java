@@ -61,6 +61,8 @@ public class Simulator {
     //The bounding volume
     Mesh bounds;
 
+    Mesh goal;
+    
     // Which rendering mode do we have
     private static boolean renderWire = false;
     private static boolean renderSmooth = false;
