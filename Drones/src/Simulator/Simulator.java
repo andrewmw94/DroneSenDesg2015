@@ -63,6 +63,14 @@ public class Simulator {
 
     Mesh goal;
     
+    final int x_resolution = 50;
+    final int y_resolution = 50;
+    
+    
+    
+    
+    
+    
     // Which rendering mode do we have
     private static boolean renderWire = false;
     private static boolean renderSmooth = false;
@@ -135,6 +143,8 @@ public class Simulator {
 
     // Main loop.
     public void run() throws FileNotFoundException {
+        Planner p = new Planner(this);
+        p.run();
 
         while (!finished) {
 
