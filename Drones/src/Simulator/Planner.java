@@ -13,7 +13,7 @@ import Utils.MotionTreeNode;
  */
 public class Planner {
 
-    private final static boolean lawnMower = false;
+    private final static boolean lawnMower = true;
     private final static boolean spiral = !lawnMower;
 
     Simulator sim;
@@ -24,7 +24,7 @@ public class Planner {
     }
 
     public void run() {
-        //searchForGoal();
+        searchForGoal();
         //planPathToGoal();
     }
 
