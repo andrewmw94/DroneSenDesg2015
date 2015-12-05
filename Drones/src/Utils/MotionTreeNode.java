@@ -5,6 +5,7 @@
  */
 package Utils;
 
+import Drone.DroneState;
 import java.util.ArrayList;
 
 /**
@@ -14,12 +15,12 @@ import java.util.ArrayList;
 public class MotionTreeNode {
     MotionTreeNode parent;
     ArrayList<MotionTreeNode> children;
-    float[] coords;
+    DroneState ds;
     
     public MotionTreeNode(float x, float y, float z) {
-        coords = new float[3];
-        coords[0] = x;
-        coords[1] = y;
-        coords[2] = z;
+        ds = new DroneState();
+        ds.x = x;
+        ds.y = y;
+        ds.z = z;
     }
 }

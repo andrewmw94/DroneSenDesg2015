@@ -24,11 +24,11 @@ public class Collision {
     }
     
     public boolean fastIsInCollision() {
-        if(d.getX() > b.maxCorner[0] || d.getX() < b.minCorner[0])
+        if(d.ourState.x > b.maxCorner[0] || d.ourState.x < b.minCorner[0])
             return true;
-        if(d.getY() > b.maxCorner[1] || d.getY() < b.minCorner[1])
+        if(d.ourState.y > b.maxCorner[1] || d.ourState.y < b.minCorner[1])
             return true;
-        if(d.getZ() > b.maxCorner[2] || d.getZ() < b.minCorner[2])
+        if(d.ourState.z > b.maxCorner[2] || d.ourState.z < b.minCorner[2])
             return true;
         
         for(Mesh m : obs) {
