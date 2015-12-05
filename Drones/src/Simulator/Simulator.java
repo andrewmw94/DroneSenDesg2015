@@ -77,16 +77,16 @@ public class Simulator {
 
     // no constructor needed - this class is static
     public Simulator() {
-        bounds = new Mesh("/home/awells/NetBeansProjects/DroneSeniorDesign2015/Drones/assets/room.obj");
+        bounds = new Mesh("assets/room.obj");
         bounds.x_offset = -10.5f;
         bounds.y_offset = -2.5f;
         bounds.z_offset = -10.5f;
-        me = new Drone(new Mesh("/home/awells/NetBeansProjects/DroneSeniorDesign2015/Drones/assets/quadrotor.obj"), 3.0f, 1.0f, 1.0f);
+        me = new Drone(new Mesh("assets/quadrotor.obj"), 3.0f, 1.0f, 1.0f);
         me.mesh.x_offset = 3f;
         me.mesh.y_offset = 2f;
         me.mesh.z_offset = 7f;
 
-        Mesh o = new Mesh("/home/awells/NetBeansProjects/DroneSeniorDesign2015/Drones/assets/cube.obj");
+        Mesh o = new Mesh("assets/cube.obj");
         o.x_offset = 1f;
         o.y_offset = 0f;
         o.z_offset = 3f;
