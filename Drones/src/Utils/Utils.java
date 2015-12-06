@@ -30,6 +30,13 @@ public class Utils {
             return false;
         }
     }
+    public static boolean isSquareCovered(float sx1,float sy1,float sx2,float sy2,float cx1,float cy1,float cx2,float cy2,float r){
+        if(isSquareInCircle(sx1,sy1,sx2,sy2,cx1,cy1,r)||isSquareInCircle(sx1,sy1,sx2,sy2,cx1,cy1,r)){
+            return true;
+        } else {
+            return sx1>=cx1&&sx2<=cx2&&sy1>=cy1&&sy2<=cy2;
+        }
+    }
     
     public static float distSquared(float x1,float y1,float x2,float y2){
         return (x2-x1)*(x2-x1)+(y2-y1)*(y2-y1);

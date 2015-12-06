@@ -6,6 +6,7 @@
 package Simulator;
 
 import Utils.MotionTreeNode;
+import Utils.Utils;
 
 /**
  *
@@ -45,18 +46,50 @@ public class Planner {
 
         if (lawnMower) {
             //move to corner
-            DroneMovement.moveTo(new float[]{x_min, y_min + sweepWidth, z_height});
-            float currY = y_min + sweepWidth;
+            DroneMovement.moveTo(new float[]{x_min, y_min + sweepWidth/2, z_height});
+            float currY = y_min + sweepWidth/2;
+            float currX = x_min + rad;
             boolean up = true;
+            boolean right = true;
 
             while (currY < y_max - sweepWidth) {
                 if (up) {
-                    DroneMovement.moveTo(new float[]{x_max, currY, z_height});
+                    if(right){
+                        DroneMovement.moveTo(new float[]{x_max, currY, z_height});
+                    } else {
+                        DroneMovement.moveTo(new float[]{x_min, currY, z_height});
+                    }
+                    right=!right;
+                    for (int j=(int)Math.floor((currY-sweepWidth/2)*sim.y_resolution/(y_max-y_min));j<(currY+sweepWidth/2)*sim.y_resolution/(y_max-y_min);j++){
+                        for(int i=0;i<sim.x_resolution;i++){
+                            if(Utils.isSquareCovered(i*(x_max-x_min)/sim.x_resolution,(j)*(y_max-y_min)/sim.y_resolution,
+                                    (i+1)*(x_max-x_min)/sim.x_resolution,(j+1)*(y_max-y_min)/sim.y_resolution,
+                                    x_min+rad,currY,x_max-rad,currY,rad)){
+                                coveredSquares[i][j]=true;
+                            }
+                        }
+                    }
                 } else {
                     currY += sweepWidth;
-                    DroneMovement.moveTo(new float[]{x_max, currY, z_height});
-                    DroneMovement.moveTo(new float[]{x_min, currY, z_height});
+                    if(right){
+                        DroneMovement.moveTo(new float[]{x_min, currY, z_height});
+                        currX=x_min+rad;
+                    } else {
+                        DroneMovement.moveTo(new float[]{x_max, currY, z_height});
+                        currX=x_max-rad;
+                    }
+                    for (int j=(int)Math.floor((currY-sweepWidth*3/2)*sim.y_resolution/(y_max-y_min));j<(currY+sweepWidth/2)*sim.y_resolution/(y_max-y_min);j++){
+                        for(int i=(int)Math.floor((currX-sweepWidth/2)*sim.x_resolution/(x_max-x_min));i<(currX+sweepWidth/2)*sim.x_resolution/(x_max-x_min);i++){
+                            if(Utils.isSquareCovered(i*(x_max-x_min)/sim.x_resolution,(j)*(y_max-y_min)/sim.y_resolution,
+                                    (i+1)*(x_max-x_min)/sim.x_resolution,(j+1)*(y_max-y_min)/sim.y_resolution,
+                                    currX,currY-sweepWidth,currX,currY,rad)){
+                                coveredSquares[i][j]=true;
+                            }
+                        }
+                    }
                 }
+                //add squares in circle
+                
                 up = !up;
             }
         } else if (spiral) {
