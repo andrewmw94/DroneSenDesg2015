@@ -37,6 +37,12 @@ public class Utils {
             return sx1>=cx1&&sx2<=cx2&&sy1>=cy1&&sy2<=cy2;
         }
     }
+    public static float[] positionConvert(float theta,float dist,float x,float y){
+        float[] f=new float[2];
+        f[1]=dist*(float)Math.cos(theta)+x;
+        f[2]=dist*(float)Math.sin(theta)+y;
+        return f;
+    }
     
     public static float distSquared(float x1,float y1,float x2,float y2){
         return (x2-x1)*(x2-x1)+(y2-y1)*(y2-y1);

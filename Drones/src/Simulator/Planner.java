@@ -98,9 +98,43 @@ public class Planner {
             float currY = (y_min + y_max) / 2;
             float currX = (x_min + x_max) / 2;
             boolean up = true;
-
-            while (currY < y_max - sweepWidth) {
-
+            float theta=0;
+            float dist=0;
+            float dtheta=.1f;
+            float ddist=.1f;
+            while (currX <= x_max - sweepWidth) {
+                if(up){
+                    currX+=sweepWidth;
+                    DroneMovement.moveTo(new float[]{currX,currY,z_height});
+                    for (int j=(int)Math.floor((currY-sweepWidth/2)*sim.y_resolution/(y_max-y_min));j<(currY+sweepWidth/2)*sim.y_resolution/(y_max-y_min);j++){
+                        for(int i=(int)Math.floor((currX-sweepWidth*3/2)*sim.x_resolution/(x_max-x_min));i<(currX+sweepWidth/2)*sim.x_resolution/(x_max-x_min);i++){
+                            if(Utils.isSquareCovered(i*(x_max-x_min)/sim.x_resolution,(j)*(y_max-y_min)/sim.y_resolution,
+                                    (i+1)*(x_max-x_min)/sim.x_resolution,(j+1)*(y_max-y_min)/sim.y_resolution,
+                                    x_min+rad,currY,x_max-rad,currY,rad)){
+                                coveredSquares[i][j]=true;
+                            }
+                        }
+                    }
+                } else {
+                    dist+=sweepWidth;
+                    float[] xy=new float[2];
+                    for(int t=0;t<100;t++){
+                        theta+=2*Math.PI/100;
+                        xy=Utils.positionConvert(theta, dist, (x_min+x_max)/2, (y_min+y_max)/2);
+                        DroneMovement.moveTo(new float[]{xy[0],xy[1],z_height});
+                        for (int j=(int)Math.floor((xy[1]-sweepWidth/2)*sim.y_resolution/(y_max-y_min));j<(xy[1]+sweepWidth/2)*sim.y_resolution/(y_max-y_min);j++){
+                            for(int i=(int)Math.floor((xy[0]-sweepWidth*3/2)*sim.x_resolution/(x_max-x_min));i<(xy[0]+sweepWidth/2)*sim.x_resolution/(x_max-x_min);i++){
+                                if(Utils.isSquareInCircle(i*(x_max-x_min)/sim.x_resolution,(j)*(y_max-y_min)/sim.y_resolution,
+                                        (i+1)*(x_max-x_min)/sim.x_resolution,(j+1)*(y_max-y_min)/sim.y_resolution,
+                                        xy[0],xy[1],rad)){
+                                    coveredSquares[i][j]=true;
+                                }
+                            }
+                        }
+                    }
+                    currX=xy[0];
+                    currY=xy[1];
+                }
             }
         }
 
