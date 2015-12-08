@@ -93,6 +93,65 @@ public class Planner {
                 up = !up;
             }
         } else if (spiral) {
+            DroneMovement.moveTo(new float[]{x_min+rad,y_min+rad,z_height});
+            float currX = x_min+rad;
+            float currY = y_min+rad;
+            int dir = 0;
+            float dist=0;
+            while(dist<(x_min+x_max)/2){
+                if(dir==0){
+                    DroneMovement.moveTo(new float[]{x_max-rad-dist,y_min+rad+dist,z_height});
+                    for (int j=(int)Math.floor((y_min+dist)*sim.y_resolution/(y_max-y_min));j<(y_min+dist+sweepWidth)*sim.y_resolution/(y_max-y_min);j++){
+                        for(int i=(int)Math.floor((x_min+dist)*sim.x_resolution/(x_max-x_min));i<(x_max-dist)*sim.x_resolution/(x_max-x_min);i++){
+                            if(Utils.isSquareCovered(i*(x_max-x_min)/sim.x_resolution,(j)*(y_max-y_min)/sim.y_resolution,
+                                    (i+1)*(x_max-x_min)/sim.x_resolution,(j+1)*(y_max-y_min)/sim.y_resolution,
+                                    currX,currY-sweepWidth,currX,currY,rad)){
+                                coveredSquares[i][j]=true;
+                            }
+                        }
+                    }
+                    dir++;
+                } else if(dir==1){
+                    DroneMovement.moveTo(new float[]{x_max-rad-dist,y_max-rad-dist,z_height});
+                    for (int j=(int)Math.floor((y_min+dist)*sim.y_resolution/(y_max-y_min));j<(y_max-dist)*sim.y_resolution/(y_max-y_min);j++){
+                        for(int i=(int)Math.floor((x_max-dist-sweepWidth)*sim.x_resolution/(x_max-x_min));i<(x_max-dist)*sim.x_resolution/(x_max-x_min);i++){
+                            if(Utils.isSquareCovered(i*(x_max-x_min)/sim.x_resolution,(j)*(y_max-y_min)/sim.y_resolution,
+                                    (i+1)*(x_max-x_min)/sim.x_resolution,(j+1)*(y_max-y_min)/sim.y_resolution,
+                                    currX,currY-sweepWidth,currX,currY,rad)){
+                                coveredSquares[i][j]=true;
+                            }
+                        }
+                    }
+                    dir++;
+                } else if(dir==2){
+                    DroneMovement.moveTo(new float[]{x_min+rad+dist,y_max-rad-dist,z_height});
+                    for (int j=(int)Math.floor((y_max-dist-sweepWidth)*sim.y_resolution/(y_max-y_min));j<(y_max-dist)*sim.y_resolution/(y_max-y_min);j++){
+                        for(int i=(int)Math.floor((x_min+dist)*sim.x_resolution/(x_max-x_min));i<(x_max-dist)*sim.x_resolution/(x_max-x_min);i++){
+                            if(Utils.isSquareCovered(i*(x_max-x_min)/sim.x_resolution,(j)*(y_max-y_min)/sim.y_resolution,
+                                    (i+1)*(x_max-x_min)/sim.x_resolution,(j+1)*(y_max-y_min)/sim.y_resolution,
+                                    currX,currY-sweepWidth,currX,currY,rad)){
+                                coveredSquares[i][j]=true;
+                            }
+                        }
+                    }
+                    dir++;
+                } else {
+                    DroneMovement.moveTo(new float[]{x_min+rad+dist,y_min+3*rad+dist,z_height});
+                    for (int j=(int)Math.floor((y_min+dist+sweepWidth)*sim.y_resolution/(y_max-y_min));j<(y_min+dist+sweepWidth)*sim.y_resolution/(y_max-y_min);j++){
+                        for(int i=(int)Math.floor((x_min+dist)*sim.x_resolution/(x_max-x_min));i<(x_max-dist-sweepWidth)*sim.x_resolution/(x_max-x_min);i++){
+                            if(Utils.isSquareCovered(i*(x_max-x_min)/sim.x_resolution,(j)*(y_max-y_min)/sim.y_resolution,
+                                    (i+1)*(x_max-x_min)/sim.x_resolution,(j+1)*(y_max-y_min)/sim.y_resolution,
+                                    currX,currY-sweepWidth,currX,currY,rad)){
+                                coveredSquares[i][j]=true;
+                            }
+                        }
+                    }
+                    dir=0;
+                    dist+=sweepWidth;
+                }
+            }
+            
+        } else {
             //move to center
             DroneMovement.moveTo(new float[]{(x_min + x_max) / 2, (y_min + y_max) / 2, z_height});
             float currY = (y_min + y_max) / 2;
