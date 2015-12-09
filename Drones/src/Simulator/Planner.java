@@ -5,8 +5,10 @@
  */
 package Simulator;
 
+import Drone.DroneState;
 import Utils.MotionTreeNode;
 import Utils.Utils;
+import java.util.ArrayList;
 
 /**
  *
@@ -19,6 +21,8 @@ public class Planner {
 
     Simulator sim;
     MotionTreeNode root;
+    
+    ArrayList<DroneState> path = new ArrayList<DroneState>();
 
     public Planner(Simulator simulator) {
         sim = simulator;
