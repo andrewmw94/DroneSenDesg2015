@@ -12,7 +12,7 @@ import org.lwjgl.BufferUtils;
  *
  * @author awells
  */
-public class Utils {
+public class OurUtils {
     // Utility function to easily create float buffers.
     public static FloatBuffer floatBuffer(float f1, float f2, float f3, float f4) {
         FloatBuffer fb = BufferUtils.createFloatBuffer(4);

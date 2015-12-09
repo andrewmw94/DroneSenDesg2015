@@ -17,6 +17,7 @@ package Simulator;
 import Drone.Drone;
 import Drone.DroneState;
 import Utils.Mesh;
+import Utils.OurUtils;
 import java.io.FileNotFoundException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
@@ -37,15 +38,15 @@ public class Simulator {
     private static final int FRAMERATE = 60;
 
     // light position and attributes 
-    private static final FloatBuffer lightPosition = Utils.Utils.floatBuffer(3.0f, 4.0f, 5.0f, 1.0f);
-    private static final FloatBuffer lightAmbient = Utils.Utils.floatBuffer(0.2f, 0.2f, 0.2f, 1.0f);
-    private static final FloatBuffer lightDiffuse = Utils.Utils.floatBuffer(0.5f, 0.5f, 0.5f, 1.0f);
-    private static final FloatBuffer lightSpecular = Utils.Utils.floatBuffer(0.1f, 0.1f, 0.1f, 1.0f);
+    private static final FloatBuffer lightPosition = Utils.OurUtils.floatBuffer(3.0f, 4.0f, 5.0f, 1.0f);
+    private static final FloatBuffer lightAmbient = Utils.OurUtils.floatBuffer(0.2f, 0.2f, 0.2f, 1.0f);
+    private static final FloatBuffer lightDiffuse = Utils.OurUtils.floatBuffer(0.5f, 0.5f, 0.5f, 1.0f);
+    private static final FloatBuffer lightSpecular = Utils.OurUtils.floatBuffer(0.1f, 0.1f, 0.1f, 1.0f);
 
     // material properties
-    private static final FloatBuffer materialAmbient = Utils.Utils.floatBuffer(1.0f, 1.0f, 1.0f, 1.0f);
-    private static final FloatBuffer materialDiffuse = Utils.Utils.floatBuffer(1.0f, 1.0f, 1.0f, 1.0f);
-    private static final FloatBuffer materialSpecular = Utils.Utils.floatBuffer(1.0f, 1.0f, 1.0f, 1.0f);
+    private static final FloatBuffer materialAmbient = Utils.OurUtils.floatBuffer(1.0f, 1.0f, 1.0f, 1.0f);
+    private static final FloatBuffer materialDiffuse = Utils.OurUtils.floatBuffer(1.0f, 1.0f, 1.0f, 1.0f);
+    private static final FloatBuffer materialSpecular = Utils.OurUtils.floatBuffer(1.0f, 1.0f, 1.0f, 1.0f);
     private static final float materialShininess = 8.0f;
 
     // exit flag
@@ -180,6 +181,8 @@ public class Simulator {
                     me.mesh.y_offset = ds.y;
                     me.mesh.z_offset = ds.z;
                     effectiveCounter++;
+                    float rad = ds.y * (float) Math.tan(Math.PI / 7);
+                    updateGrid(new float[] {ds.x, ds.y, ds.z}, rad);
                 }
 
                 counter++;
@@ -206,7 +209,7 @@ public class Simulator {
             }
         }
     }
-
+    
     // Clean up before exit.
     private void cleanup() {
 
@@ -516,5 +519,25 @@ public class Simulator {
 
         // renable lighting
         glEnable(GL_LIGHTING);
+    }
+    
+    
+    
+    private void updateGrid(float[] p, float rad) {
+        for(int i = 0; i < grid.length; i++) {
+            for(int j = 0; j < grid[i].length; j++) {
+                if(!grid[i][j]) {
+                    float x1, y1, x2, y2;
+                    x1 = (float) (i*(15.0/x_resolution));
+                    y1 = (float) (j*(15.0/x_resolution));
+                    x2 = (float) ((i+1)*(15.0/x_resolution));
+                    y2 = (float) ((j+1)*(15.0/x_resolution));
+
+                    if(OurUtils.isSquareInCircle(x1, y1, x2, y2, p[0], p[2], rad)) {
+                        grid[i][j] = true;
+                    }
+                }
+            }            
+        }
     }
 }

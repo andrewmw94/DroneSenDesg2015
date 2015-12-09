@@ -6,7 +6,7 @@
 package Simulator;
 
 import Drone.DroneState;
-import Utils.Utils;
+import Utils.OurUtils;
 import java.util.ArrayList;
 
 /**
@@ -46,7 +46,7 @@ public class DroneMovement {
             ds.z = z;
             path.add(ds);
             
-            if(Utils.distSquared(x, y, z, p[0], p[1], p[2]) < 0.1) {
+            if(OurUtils.distSquared(x, y, z, p[0], p[1], p[2]) < 0.1) {
                 break;
             }
             
