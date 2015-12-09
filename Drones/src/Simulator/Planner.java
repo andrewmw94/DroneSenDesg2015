@@ -31,7 +31,7 @@ public class Planner {
 
     public boolean searchForGoal() {
         //move drone to corner
-        boolean[][] coveredSquares = new boolean[sim.x_resolution][sim.y_resolution];
+        boolean[][] coveredSquares = sim.grid;//new boolean[sim.x_resolution][sim.y_resolution];
         float x_min = 0.0f;
         float x_max = 15.0f;
         float y_min = 0.0f;

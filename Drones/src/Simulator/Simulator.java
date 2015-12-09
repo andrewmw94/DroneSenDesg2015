@@ -298,13 +298,10 @@ public class Simulator {
         float xOffset = 15.0f / x_resolution;
         float yOffset = 15.0f / y_resolution;
 
-        System.out.println(xOffset);
-        System.out.println(yOffset);
-
         for (int i = 0; i < x_resolution; i++) {
             for (int j = 0; j < y_resolution; j++) {
                 float[] c;
-                if (grid[i][j] || i % 2 == 0 && j % 2 == 0) {
+                if (grid[i][j]) {
                     c = new float[]{1f, 1f, 0f};
                 } else {
                     c = new float[]{0f, 1f, 1f};
