@@ -153,8 +153,10 @@ public class Simulator {
     public void run() throws FileNotFoundException {
         Planner p = new Planner(this);
         p.run();
-        
-        int counter = 0;
+
+        int counter = 1;
+        int effectiveCounter = 0;
+        int frmRt = 2;
         int pLength = p.path.size();
 
         while (!finished) {
@@ -170,13 +172,16 @@ public class Simulator {
                 // The window is in the foreground, so we should play the game
                 logic();
                 render();
-                
+
                 //move the drone
-                DroneState ds = p.path.get(counter%pLength);
-                me.mesh.x_offset = ds.x;
-                me.mesh.y_offset = ds.z;
-                me.mesh.z_offset = ds.y;
-                
+                if (counter % frmRt == 0) {
+                    DroneState ds = p.path.get(effectiveCounter % pLength);
+                    me.mesh.x_offset = ds.x;
+                    me.mesh.y_offset = ds.y;
+                    me.mesh.z_offset = ds.z;
+                    effectiveCounter++;
+                }
+
                 counter++;
                 //renderCoordinateFrame();
 
@@ -319,7 +324,7 @@ public class Simulator {
                     c = new float[]{0f, 1f, 1f};
                 }
                 //drawSquare(-10.5f + xOffset * i, -10.5f + yOffset * j, -10.5f + xOffset * i + xOffset, -10.5f + yOffset * j + yOffset, c);
-                drawSquare(xOffset * i,yOffset * j, xOffset * i + xOffset, yOffset * j + yOffset, c);
+                drawSquare(xOffset * i, yOffset * j, xOffset * i + xOffset, yOffset * j + yOffset, c);
 
             }
         }
@@ -350,15 +355,14 @@ public class Simulator {
 
             //glTranslatef(mg.x_offset, mg.y_offset, mg.z_offset);
             //glPushMatrix();
-
             // draw triangles
             glBegin(GL_TRIANGLES);
 
             for (int i = 0; i < mg.f.length; i++) {
                 glNormal3f(mg.nf[i][0] / mg.diagLength, mg.nf[i][1] / mg.diagLength, mg.nf[i][2] / mg.diagLength);
-                glVertex3f(mg.x_offset+mg.v[mg.f[i][0]][0], mg.y_offset+mg.v[mg.f[i][0]][1], mg.z_offset+mg.v[mg.f[i][0]][2]);
-                glVertex3f(mg.x_offset+mg.v[mg.f[i][1]][0], mg.y_offset+mg.v[mg.f[i][1]][1], mg.z_offset+mg.v[mg.f[i][1]][2]);
-                glVertex3f(mg.x_offset+mg.v[mg.f[i][2]][0], mg.y_offset+mg.v[mg.f[i][2]][1], mg.z_offset+mg.v[mg.f[i][2]][2]);
+                glVertex3f(mg.x_offset + mg.v[mg.f[i][0]][0], mg.y_offset + mg.v[mg.f[i][0]][1], mg.z_offset + mg.v[mg.f[i][0]][2]);
+                glVertex3f(mg.x_offset + mg.v[mg.f[i][1]][0], mg.y_offset + mg.v[mg.f[i][1]][1], mg.z_offset + mg.v[mg.f[i][1]][2]);
+                glVertex3f(mg.x_offset + mg.v[mg.f[i][2]][0], mg.y_offset + mg.v[mg.f[i][2]][1], mg.z_offset + mg.v[mg.f[i][2]][2]);
             }
 
             glEnd();
@@ -374,17 +378,17 @@ public class Simulator {
             glBegin(GL_LINES);
             for (int i = 0; i < mg.f.length; i++) {
                 glNormal3f(mg.nv[mg.f[i][0]][0] / mg.diagLength, mg.nv[mg.f[i][0]][1] / mg.diagLength, mg.nv[mg.f[i][0]][2] / mg.diagLength);
-                glVertex3f(mg.x_offset+mg.v[mg.f[i][0]][0], mg.y_offset+mg.v[mg.f[i][0]][1], mg.z_offset+mg.v[mg.f[i][0]][2]);
+                glVertex3f(mg.x_offset + mg.v[mg.f[i][0]][0], mg.y_offset + mg.v[mg.f[i][0]][1], mg.z_offset + mg.v[mg.f[i][0]][2]);
                 glNormal3f(mg.nv[mg.f[i][1]][0] / mg.diagLength, mg.nv[mg.f[i][1]][1] / mg.diagLength, mg.nv[mg.f[i][1]][2] / mg.diagLength);
-                glVertex3f(mg.x_offset+mg.v[mg.f[i][1]][0], mg.y_offset+mg.v[mg.f[i][1]][1], mg.z_offset+mg.v[mg.f[i][1]][2]);
+                glVertex3f(mg.x_offset + mg.v[mg.f[i][1]][0], mg.y_offset + mg.v[mg.f[i][1]][1], mg.z_offset + mg.v[mg.f[i][1]][2]);
                 glNormal3f(mg.nv[mg.f[i][1]][0] / mg.diagLength, mg.nv[mg.f[i][1]][1] / mg.diagLength, mg.nv[mg.f[i][1]][2] / mg.diagLength);
-                glVertex3f(mg.x_offset+mg.v[mg.f[i][1]][0], mg.y_offset+mg.v[mg.f[i][1]][1], mg.z_offset+mg.v[mg.f[i][1]][2]);
+                glVertex3f(mg.x_offset + mg.v[mg.f[i][1]][0], mg.y_offset + mg.v[mg.f[i][1]][1], mg.z_offset + mg.v[mg.f[i][1]][2]);
                 glNormal3f(mg.nv[mg.f[i][2]][0] / mg.diagLength, mg.nv[mg.f[i][2]][1] / mg.diagLength, mg.nv[mg.f[i][2]][2] / mg.diagLength);
-                glVertex3f(mg.x_offset+mg.v[mg.f[i][2]][0], mg.y_offset+mg.v[mg.f[i][2]][1], mg.z_offset+mg.v[mg.f[i][2]][2]);
+                glVertex3f(mg.x_offset + mg.v[mg.f[i][2]][0], mg.y_offset + mg.v[mg.f[i][2]][1], mg.z_offset + mg.v[mg.f[i][2]][2]);
                 glNormal3f(mg.nv[mg.f[i][2]][0] / mg.diagLength, mg.nv[mg.f[i][2]][1] / mg.diagLength, mg.nv[mg.f[i][2]][2] / mg.diagLength);
-                glVertex3f(mg.x_offset+mg.v[mg.f[i][2]][0], mg.y_offset+mg.v[mg.f[i][2]][1], mg.z_offset+mg.v[mg.f[i][2]][2]);
+                glVertex3f(mg.x_offset + mg.v[mg.f[i][2]][0], mg.y_offset + mg.v[mg.f[i][2]][1], mg.z_offset + mg.v[mg.f[i][2]][2]);
                 glNormal3f(mg.nv[mg.f[i][0]][0] / mg.diagLength, mg.nv[mg.f[i][0]][1] / mg.diagLength, mg.nv[mg.f[i][0]][2] / mg.diagLength);
-                glVertex3f(mg.x_offset+mg.v[mg.f[i][0]][0], mg.y_offset+mg.v[mg.f[i][0]][1], mg.z_offset+mg.v[mg.f[i][0]][2]);
+                glVertex3f(mg.x_offset + mg.v[mg.f[i][0]][0], mg.y_offset + mg.v[mg.f[i][0]][1], mg.z_offset + mg.v[mg.f[i][0]][2]);
             }
             glEnd();
             //glPopMatrix();
@@ -394,16 +398,15 @@ public class Simulator {
 
             //glTranslatef(mg.x_offset, mg.y_offset, mg.z_offset);
             //glPushMatrix();
-
             glBegin(GL_TRIANGLES);
             glLoadIdentity();
             for (int i = 0; i < mg.f.length; i++) {
                 glNormal3f(mg.nv[mg.f[i][0]][0] / mg.diagLength, mg.nv[mg.f[i][0]][1] / mg.diagLength, mg.nv[mg.f[i][0]][2] / mg.diagLength);
-                glVertex3f(mg.x_offset+mg.v[mg.f[i][0]][0], mg.y_offset+mg.v[mg.f[i][0]][1], mg.z_offset+mg.v[mg.f[i][0]][2]);
+                glVertex3f(mg.x_offset + mg.v[mg.f[i][0]][0], mg.y_offset + mg.v[mg.f[i][0]][1], mg.z_offset + mg.v[mg.f[i][0]][2]);
                 glNormal3f(mg.nv[mg.f[i][1]][0] / mg.diagLength, mg.nv[mg.f[i][1]][1] / mg.diagLength, mg.nv[mg.f[i][1]][2] / mg.diagLength);
-                glVertex3f(mg.x_offset+mg.v[mg.f[i][1]][0], mg.y_offset+mg.v[mg.f[i][1]][1], mg.z_offset+mg.v[mg.f[i][1]][2]);
+                glVertex3f(mg.x_offset + mg.v[mg.f[i][1]][0], mg.y_offset + mg.v[mg.f[i][1]][1], mg.z_offset + mg.v[mg.f[i][1]][2]);
                 glNormal3f(mg.nv[mg.f[i][2]][0] / mg.diagLength, mg.nv[mg.f[i][2]][1] / mg.diagLength, mg.nv[mg.f[i][2]][2] / mg.diagLength);
-                glVertex3f(mg.x_offset+mg.v[mg.f[i][2]][0], mg.y_offset+mg.v[mg.f[i][2]][1], mg.z_offset+mg.v[mg.f[i][2]][2]);
+                glVertex3f(mg.x_offset + mg.v[mg.f[i][2]][0], mg.y_offset + mg.v[mg.f[i][2]][1], mg.z_offset + mg.v[mg.f[i][2]][2]);
             }
 
             glEnd();

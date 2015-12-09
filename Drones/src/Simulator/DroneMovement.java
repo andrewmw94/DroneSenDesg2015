@@ -55,8 +55,6 @@ public class DroneMovement {
             z+=zDiff;
             
         }
-        
-        
         return path;
     }
 }
