@@ -15,6 +15,7 @@
 package Simulator;
 
 import Drone.Drone;
+import Drone.DroneState;
 import Utils.Mesh;
 import java.io.FileNotFoundException;
 import org.lwjgl.input.Keyboard;
@@ -152,6 +153,9 @@ public class Simulator {
     public void run() throws FileNotFoundException {
         Planner p = new Planner(this);
         p.run();
+        
+        int counter = 0;
+        int pLength = p.path.size();
 
         while (!finished) {
 
@@ -166,6 +170,14 @@ public class Simulator {
                 // The window is in the foreground, so we should play the game
                 logic();
                 render();
+                
+                //move the drone
+                DroneState ds = p.path.get(counter%pLength);
+                me.mesh.x_offset = ds.x;
+                me.mesh.y_offset = ds.z;
+                me.mesh.z_offset = ds.y;
+                
+                counter++;
                 //renderCoordinateFrame();
 
                 Display.sync(FRAMERATE);
