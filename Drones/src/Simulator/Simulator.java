@@ -27,6 +27,8 @@ import static org.lwjgl.opengl.GL11.*;
 
 public class Simulator {
 
+    public static final boolean showGrid = true;
+
     // window title
     public static final String APP_TITLE = "Drone Simulator";
 
@@ -62,15 +64,12 @@ public class Simulator {
     Mesh bounds;
 
     Mesh goal;
-    
+
     final int x_resolution = 50;
     final int y_resolution = 50;
-    
-    
-    
-    
-    
-    
+
+    boolean[][] grid = new boolean[x_resolution][y_resolution];
+
     // Which rendering mode do we have
     private static boolean renderWire = false;
     private static boolean renderSmooth = false;
@@ -78,13 +77,21 @@ public class Simulator {
     // no constructor needed - this class is static
     public Simulator() {
         bounds = new Mesh("assets/room.obj");
-        bounds.x_offset = -10.5f;
-        bounds.y_offset = -2.5f;
-        bounds.z_offset = -10.5f;
+//        bounds.x_offset = -10.5f;
+//        bounds.y_offset = -2.5f;
+//        bounds.z_offset = -10.5f;
+        bounds.x_offset = 0f;
+        bounds.y_offset = 0f;
+        bounds.z_offset = 0f;
         me = new Drone(new Mesh("assets/quadrotor.obj"), 3.0f, 1.0f, 1.0f);
         me.mesh.x_offset = 3f;
         me.mesh.y_offset = 2f;
         me.mesh.z_offset = 7f;
+
+        goal = new Mesh("assets/cube.obj");
+        goal.x_offset = 9f;
+        goal.y_offset = 0f;
+        goal.z_offset = 4f;
 
         Mesh o = new Mesh("assets/cube.obj");
         o.x_offset = 1f;
@@ -157,9 +164,10 @@ public class Simulator {
             } else if (Display.isActive()) {
 
                 // The window is in the foreground, so we should play the game
-                //logic();
+                logic();
                 render();
-                renderCoordinateFrame();
+                //renderCoordinateFrame();
+
                 Display.sync(FRAMERATE);
 
             } else {
@@ -248,10 +256,15 @@ public class Simulator {
 
         // Scale to 25 since scaling to 1 causes weird results for the color or lighting or something.
         //renderMesh();
-        renderCoordinateFrame();
+        //renderCoordinateFrame();
         renderBounds();
         renderObstacles();
         renderMyself();
+        renderGoal();
+
+        if (showGrid) {
+            renderGrid();
+        }
 
         // pop out of object space and back into camera space
         glPopMatrix();
@@ -264,17 +277,57 @@ public class Simulator {
     }
 
     private void renderBounds() {
-        renderMesh(bounds, true, false, new float[] {0f, 0f, 0f});
+        renderMesh(bounds, true, false, new float[]{0f, 0f, 0f});
     }
 
     private void renderObstacles() {
         for (Mesh m : obstacles) {
-            renderMesh(m, false, false, new float[] {0f, 1f, 0f});
+            renderMesh(m, false, false, new float[]{0f, 1f, 0f});
         }
     }
 
     private void renderMyself() {
-        renderMesh(me.mesh, false, false, new float[] {0f, 0f, 1f});
+        renderMesh(me.mesh, false, false, new float[]{0f, 0f, 1f});
+    }
+
+    private void renderGoal() {
+        renderMesh(goal, true, false, new float[]{1f, 0f, 0f});
+    }
+
+    private void renderGrid() {
+        float xOffset = 15.0f / x_resolution;
+        float yOffset = 15.0f / y_resolution;
+
+        System.out.println(xOffset);
+        System.out.println(yOffset);
+
+        for (int i = 0; i < x_resolution; i++) {
+            for (int j = 0; j < y_resolution; j++) {
+                float[] c;
+                if (grid[i][j] || i % 2 == 0 && j % 2 == 0) {
+                    c = new float[]{1f, 1f, 0f};
+                } else {
+                    c = new float[]{0f, 1f, 1f};
+                }
+                //drawSquare(-10.5f + xOffset * i, -10.5f + yOffset * j, -10.5f + xOffset * i + xOffset, -10.5f + yOffset * j + yOffset, c);
+                drawSquare(xOffset * i,yOffset * j, xOffset * i + xOffset, yOffset * j + yOffset, c);
+
+            }
+        }
+    }
+
+    private void drawSquare(float x1, float y1, float x2, float y2, float[] color) {
+        float z = 0f;
+        glColor3f(color[0], color[1], color[2]);
+        //glTranslatef(x1, z, y1);
+        //glPushMatrix();
+        glBegin(GL_QUADS);
+        glVertex3f(x1, z, y1);
+        glVertex3f(x1, z, y2);
+        glVertex3f(x2, z, y2);
+        glVertex3f(x2, z, y1);
+        glEnd();
+        //glPopMatrix();
     }
 
     private void renderMesh(Mesh mg, boolean renderWire, boolean renderSmooth, float[] color) {
@@ -286,69 +339,140 @@ public class Simulator {
             // set flat shading 
             glShadeModel(GL_FLAT);
 
-            glTranslatef(mg.x_offset, mg.y_offset, mg.z_offset);
-            glPushMatrix();
+            //glTranslatef(mg.x_offset, mg.y_offset, mg.z_offset);
+            //glPushMatrix();
 
             // draw triangles
             glBegin(GL_TRIANGLES);
 
             for (int i = 0; i < mg.f.length; i++) {
                 glNormal3f(mg.nf[i][0] / mg.diagLength, mg.nf[i][1] / mg.diagLength, mg.nf[i][2] / mg.diagLength);
-                glVertex3f(mg.v[mg.f[i][0]][0], mg.v[mg.f[i][0]][1], mg.v[mg.f[i][0]][2]);
-                glVertex3f(mg.v[mg.f[i][1]][0], mg.v[mg.f[i][1]][1], mg.v[mg.f[i][1]][2]);
-                glVertex3f(mg.v[mg.f[i][2]][0], mg.v[mg.f[i][2]][1], mg.v[mg.f[i][2]][2]);
+                glVertex3f(mg.x_offset+mg.v[mg.f[i][0]][0], mg.y_offset+mg.v[mg.f[i][0]][1], mg.z_offset+mg.v[mg.f[i][0]][2]);
+                glVertex3f(mg.x_offset+mg.v[mg.f[i][1]][0], mg.y_offset+mg.v[mg.f[i][1]][1], mg.z_offset+mg.v[mg.f[i][1]][2]);
+                glVertex3f(mg.x_offset+mg.v[mg.f[i][2]][0], mg.y_offset+mg.v[mg.f[i][2]][1], mg.z_offset+mg.v[mg.f[i][2]][2]);
             }
 
             glEnd();
-            glPopMatrix();
+            //glPopMatrix();
         } else if (renderWire) {
 
             // set smooth shading 
             glShadeModel(GL_SMOOTH);
 
-            glTranslatef(mg.x_offset, mg.y_offset, mg.z_offset);
-            glPushMatrix();
+            //glTranslatef(mg.x_offset, mg.y_offset, mg.z_offset);
+            //glPushMatrix();
             // draw lines
             glBegin(GL_LINES);
             for (int i = 0; i < mg.f.length; i++) {
                 glNormal3f(mg.nv[mg.f[i][0]][0] / mg.diagLength, mg.nv[mg.f[i][0]][1] / mg.diagLength, mg.nv[mg.f[i][0]][2] / mg.diagLength);
-                glVertex3f(mg.v[mg.f[i][0]][0], mg.v[mg.f[i][0]][1], mg.v[mg.f[i][0]][2]);
+                glVertex3f(mg.x_offset+mg.v[mg.f[i][0]][0], mg.y_offset+mg.v[mg.f[i][0]][1], mg.z_offset+mg.v[mg.f[i][0]][2]);
                 glNormal3f(mg.nv[mg.f[i][1]][0] / mg.diagLength, mg.nv[mg.f[i][1]][1] / mg.diagLength, mg.nv[mg.f[i][1]][2] / mg.diagLength);
-                glVertex3f(mg.v[mg.f[i][1]][0], mg.v[mg.f[i][1]][1], mg.v[mg.f[i][1]][2]);
+                glVertex3f(mg.x_offset+mg.v[mg.f[i][1]][0], mg.y_offset+mg.v[mg.f[i][1]][1], mg.z_offset+mg.v[mg.f[i][1]][2]);
                 glNormal3f(mg.nv[mg.f[i][1]][0] / mg.diagLength, mg.nv[mg.f[i][1]][1] / mg.diagLength, mg.nv[mg.f[i][1]][2] / mg.diagLength);
-                glVertex3f(mg.v[mg.f[i][1]][0], mg.v[mg.f[i][1]][1], mg.v[mg.f[i][1]][2]);
+                glVertex3f(mg.x_offset+mg.v[mg.f[i][1]][0], mg.y_offset+mg.v[mg.f[i][1]][1], mg.z_offset+mg.v[mg.f[i][1]][2]);
                 glNormal3f(mg.nv[mg.f[i][2]][0] / mg.diagLength, mg.nv[mg.f[i][2]][1] / mg.diagLength, mg.nv[mg.f[i][2]][2] / mg.diagLength);
-                glVertex3f(mg.v[mg.f[i][2]][0], mg.v[mg.f[i][2]][1], mg.v[mg.f[i][2]][2]);
+                glVertex3f(mg.x_offset+mg.v[mg.f[i][2]][0], mg.y_offset+mg.v[mg.f[i][2]][1], mg.z_offset+mg.v[mg.f[i][2]][2]);
                 glNormal3f(mg.nv[mg.f[i][2]][0] / mg.diagLength, mg.nv[mg.f[i][2]][1] / mg.diagLength, mg.nv[mg.f[i][2]][2] / mg.diagLength);
-                glVertex3f(mg.v[mg.f[i][2]][0], mg.v[mg.f[i][2]][1], mg.v[mg.f[i][2]][2]);
+                glVertex3f(mg.x_offset+mg.v[mg.f[i][2]][0], mg.y_offset+mg.v[mg.f[i][2]][1], mg.z_offset+mg.v[mg.f[i][2]][2]);
                 glNormal3f(mg.nv[mg.f[i][0]][0] / mg.diagLength, mg.nv[mg.f[i][0]][1] / mg.diagLength, mg.nv[mg.f[i][0]][2] / mg.diagLength);
-                glVertex3f(mg.v[mg.f[i][0]][0], mg.v[mg.f[i][0]][1], mg.v[mg.f[i][0]][2]);
+                glVertex3f(mg.x_offset+mg.v[mg.f[i][0]][0], mg.y_offset+mg.v[mg.f[i][0]][1], mg.z_offset+mg.v[mg.f[i][0]][2]);
             }
             glEnd();
-            glPopMatrix();
+            //glPopMatrix();
         } else {
             // set smooth shading 
             glShadeModel(GL_SMOOTH);
 
-            glTranslatef(mg.x_offset, mg.y_offset, mg.z_offset);
-            glPushMatrix();
+            //glTranslatef(mg.x_offset, mg.y_offset, mg.z_offset);
+            //glPushMatrix();
 
             glBegin(GL_TRIANGLES);
             glLoadIdentity();
             for (int i = 0; i < mg.f.length; i++) {
                 glNormal3f(mg.nv[mg.f[i][0]][0] / mg.diagLength, mg.nv[mg.f[i][0]][1] / mg.diagLength, mg.nv[mg.f[i][0]][2] / mg.diagLength);
-                glVertex3f(mg.v[mg.f[i][0]][0], mg.v[mg.f[i][0]][1], mg.v[mg.f[i][0]][2]);
+                glVertex3f(mg.x_offset+mg.v[mg.f[i][0]][0], mg.y_offset+mg.v[mg.f[i][0]][1], mg.z_offset+mg.v[mg.f[i][0]][2]);
                 glNormal3f(mg.nv[mg.f[i][1]][0] / mg.diagLength, mg.nv[mg.f[i][1]][1] / mg.diagLength, mg.nv[mg.f[i][1]][2] / mg.diagLength);
-                glVertex3f(mg.v[mg.f[i][1]][0], mg.v[mg.f[i][1]][1], mg.v[mg.f[i][1]][2]);
+                glVertex3f(mg.x_offset+mg.v[mg.f[i][1]][0], mg.y_offset+mg.v[mg.f[i][1]][1], mg.z_offset+mg.v[mg.f[i][1]][2]);
                 glNormal3f(mg.nv[mg.f[i][2]][0] / mg.diagLength, mg.nv[mg.f[i][2]][1] / mg.diagLength, mg.nv[mg.f[i][2]][2] / mg.diagLength);
-                glVertex3f(mg.v[mg.f[i][2]][0], mg.v[mg.f[i][2]][1], mg.v[mg.f[i][2]][2]);
+                glVertex3f(mg.x_offset+mg.v[mg.f[i][2]][0], mg.y_offset+mg.v[mg.f[i][2]][1], mg.z_offset+mg.v[mg.f[i][2]][2]);
             }
 
             glEnd();
-            glPopMatrix();
+            //glPopMatrix();
         }
     }
 
+//    private void renderMesh(Mesh mg, boolean renderWire, boolean renderSmooth, float[] color) {
+//
+//        glColor3f(color[0], color[1], color[2]);
+//
+//        if (!renderWire && !renderSmooth) {
+//
+//            // set flat shading 
+//            glShadeModel(GL_FLAT);
+//
+//            glTranslatef(mg.x_offset, mg.y_offset, mg.z_offset);
+//            //glPushMatrix();
+//
+//            // draw triangles
+//            glBegin(GL_TRIANGLES);
+//
+//            for (int i = 0; i < mg.f.length; i++) {
+//                glNormal3f(mg.nf[i][0] / mg.diagLength, mg.nf[i][1] / mg.diagLength, mg.nf[i][2] / mg.diagLength);
+//                glVertex3f(mg.v[mg.f[i][0]][0], mg.v[mg.f[i][0]][1], mg.v[mg.f[i][0]][2]);
+//                glVertex3f(mg.v[mg.f[i][1]][0], mg.v[mg.f[i][1]][1], mg.v[mg.f[i][1]][2]);
+//                glVertex3f(mg.v[mg.f[i][2]][0], mg.v[mg.f[i][2]][1], mg.v[mg.f[i][2]][2]);
+//            }
+//
+//            glEnd();
+//            //glPopMatrix();
+//        } else if (renderWire) {
+//
+//            // set smooth shading 
+//            glShadeModel(GL_SMOOTH);
+//
+//            glTranslatef(mg.x_offset, mg.y_offset, mg.z_offset);
+//            //glPushMatrix();
+//            // draw lines
+//            glBegin(GL_LINES);
+//            for (int i = 0; i < mg.f.length; i++) {
+//                glNormal3f(mg.nv[mg.f[i][0]][0] / mg.diagLength, mg.nv[mg.f[i][0]][1] / mg.diagLength, mg.nv[mg.f[i][0]][2] / mg.diagLength);
+//                glVertex3f(mg.v[mg.f[i][0]][0], mg.v[mg.f[i][0]][1], mg.v[mg.f[i][0]][2]);
+//                glNormal3f(mg.nv[mg.f[i][1]][0] / mg.diagLength, mg.nv[mg.f[i][1]][1] / mg.diagLength, mg.nv[mg.f[i][1]][2] / mg.diagLength);
+//                glVertex3f(mg.v[mg.f[i][1]][0], mg.v[mg.f[i][1]][1], mg.v[mg.f[i][1]][2]);
+//                glNormal3f(mg.nv[mg.f[i][1]][0] / mg.diagLength, mg.nv[mg.f[i][1]][1] / mg.diagLength, mg.nv[mg.f[i][1]][2] / mg.diagLength);
+//                glVertex3f(mg.v[mg.f[i][1]][0], mg.v[mg.f[i][1]][1], mg.v[mg.f[i][1]][2]);
+//                glNormal3f(mg.nv[mg.f[i][2]][0] / mg.diagLength, mg.nv[mg.f[i][2]][1] / mg.diagLength, mg.nv[mg.f[i][2]][2] / mg.diagLength);
+//                glVertex3f(mg.v[mg.f[i][2]][0], mg.v[mg.f[i][2]][1], mg.v[mg.f[i][2]][2]);
+//                glNormal3f(mg.nv[mg.f[i][2]][0] / mg.diagLength, mg.nv[mg.f[i][2]][1] / mg.diagLength, mg.nv[mg.f[i][2]][2] / mg.diagLength);
+//                glVertex3f(mg.v[mg.f[i][2]][0], mg.v[mg.f[i][2]][1], mg.v[mg.f[i][2]][2]);
+//                glNormal3f(mg.nv[mg.f[i][0]][0] / mg.diagLength, mg.nv[mg.f[i][0]][1] / mg.diagLength, mg.nv[mg.f[i][0]][2] / mg.diagLength);
+//                glVertex3f(mg.v[mg.f[i][0]][0], mg.v[mg.f[i][0]][1], mg.v[mg.f[i][0]][2]);
+//            }
+//            glEnd();
+//            //glPopMatrix();
+//        } else {
+//            // set smooth shading 
+//            glShadeModel(GL_SMOOTH);
+//
+//            glTranslatef(mg.x_offset, mg.y_offset, mg.z_offset);
+//            //glPushMatrix();
+//
+//            glBegin(GL_TRIANGLES);
+//            glLoadIdentity();
+//            for (int i = 0; i < mg.f.length; i++) {
+//                glNormal3f(mg.nv[mg.f[i][0]][0] / mg.diagLength, mg.nv[mg.f[i][0]][1] / mg.diagLength, mg.nv[mg.f[i][0]][2] / mg.diagLength);
+//                glVertex3f(mg.v[mg.f[i][0]][0], mg.v[mg.f[i][0]][1], mg.v[mg.f[i][0]][2]);
+//                glNormal3f(mg.nv[mg.f[i][1]][0] / mg.diagLength, mg.nv[mg.f[i][1]][1] / mg.diagLength, mg.nv[mg.f[i][1]][2] / mg.diagLength);
+//                glVertex3f(mg.v[mg.f[i][1]][0], mg.v[mg.f[i][1]][1], mg.v[mg.f[i][1]][2]);
+//                glNormal3f(mg.nv[mg.f[i][2]][0] / mg.diagLength, mg.nv[mg.f[i][2]][1] / mg.diagLength, mg.nv[mg.f[i][2]][2] / mg.diagLength);
+//                glVertex3f(mg.v[mg.f[i][2]][0], mg.v[mg.f[i][2]][1], mg.v[mg.f[i][2]][2]);
+//            }
+//
+//            glEnd();
+//            //glPopMatrix();
+//        }
+//    }
     // Render the basis vectors of the coordinate frame: x (red), y (blue), and
     // z (green). Can be useful for debugging purposes. 
     private static void renderCoordinateFrame() {
