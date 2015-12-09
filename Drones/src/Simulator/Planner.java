@@ -59,8 +59,11 @@ public class Planner {
             float currX = x_min + rad;
             boolean up = true;
             boolean right = true;
-
-            while (currY < y_max - sweepWidth) {
+            boolean notDoneYet = true;
+            while (currY < y_max - sweepWidth||notDoneYet) {
+                if(currY>=y_max-sweepWidth){
+                    notDoneYet=false;
+                }
                 if (up) {
                     if(right){
                         path.addAll(DroneMovement.moveTo(path.get(path.size()-1),new float[]{x_max, z_height, currY}));
