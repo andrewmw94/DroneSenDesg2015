@@ -70,7 +70,7 @@ public class Planner {
                     right=!right;
 //                    for (int j=(int)Math.floor((currY-sweepWidth/2)*sim.y_resolution/(y_max-y_min));j<(currY+sweepWidth/2)*sim.y_resolution/(y_max-y_min);j++){
 //                        for(int i=0;i<sim.x_resolution;i++){
-//                            if(OurUtils.isSquareCovered(i*(x_max-x_min)/sim.x_resolution,(j)*(y_max-y_min)/sim.y_resolution,
+//                            if(Utils.isSquareCovered(i*(x_max-x_min)/sim.x_resolution,(j)*(y_max-y_min)/sim.y_resolution,
 //                                    (i+1)*(x_max-x_min)/sim.x_resolution,(j+1)*(y_max-y_min)/sim.y_resolution,
 //                                    x_min+rad,currY,x_max-rad,currY,rad)){
 //                                coveredSquares[i][j]=true;
@@ -88,7 +88,7 @@ public class Planner {
                     }
 //                    for (int j=(int)Math.floor((currY-sweepWidth*3/2)*sim.y_resolution/(y_max-y_min));j<(currY+sweepWidth/2)*sim.y_resolution/(y_max-y_min);j++){
 //                        for(int i=(int)Math.floor((currX-sweepWidth/2)*sim.x_resolution/(x_max-x_min));i<(currX+sweepWidth/2)*sim.x_resolution/(x_max-x_min);i++){
-//                            if(OurUtils.isSquareCovered(i*(x_max-x_min)/sim.x_resolution,(j)*(y_max-y_min)/sim.y_resolution,
+//                            if(Utils.isSquareCovered(i*(x_max-x_min)/sim.x_resolution,(j)*(y_max-y_min)/sim.y_resolution,
 //                                    (i+1)*(x_max-x_min)/sim.x_resolution,(j+1)*(y_max-y_min)/sim.y_resolution,
 //                                    currX,currY-sweepWidth,currX,currY,rad)){
 //                                coveredSquares[i][j]=true;
@@ -111,7 +111,7 @@ public class Planner {
                     path.addAll(DroneMovement.moveTo(path.get(path.size()-1),new float[]{x_max-rad-dist,z_height,y_min+rad+dist}));
 //                    for (int j=(int)Math.floor((y_min+dist)*sim.y_resolution/(y_max-y_min));j<(y_min+dist+sweepWidth)*sim.y_resolution/(y_max-y_min);j++){
 //                        for(int i=(int)Math.floor((x_min+dist)*sim.x_resolution/(x_max-x_min));i<(x_max-dist)*sim.x_resolution/(x_max-x_min);i++){
-//                            if(OurUtils.isSquareCovered(i*(x_max-x_min)/sim.x_resolution,(j)*(y_max-y_min)/sim.y_resolution,
+//                            if(Utils.isSquareCovered(i*(x_max-x_min)/sim.x_resolution,(j)*(y_max-y_min)/sim.y_resolution,
 //                                    (i+1)*(x_max-x_min)/sim.x_resolution,(j+1)*(y_max-y_min)/sim.y_resolution,
 //                                    currX,currY-sweepWidth,currX,currY,rad)){
 //                                coveredSquares[i][j]=true;
@@ -123,7 +123,7 @@ public class Planner {
                     path.addAll(DroneMovement.moveTo(path.get(path.size()-1),new float[]{x_max-rad-dist,z_height,y_max-rad-dist}));
 //                    for (int j=(int)Math.floor((y_min+dist)*sim.y_resolution/(y_max-y_min));j<(y_max-dist)*sim.y_resolution/(y_max-y_min);j++){
 //                        for(int i=(int)Math.floor((x_max-dist-sweepWidth)*sim.x_resolution/(x_max-x_min));i<(x_max-dist)*sim.x_resolution/(x_max-x_min);i++){
-//                            if(OurUtils.isSquareCovered(i*(x_max-x_min)/sim.x_resolution,(j)*(y_max-y_min)/sim.y_resolution,
+//                            if(Utils.isSquareCovered(i*(x_max-x_min)/sim.x_resolution,(j)*(y_max-y_min)/sim.y_resolution,
 //                                    (i+1)*(x_max-x_min)/sim.x_resolution,(j+1)*(y_max-y_min)/sim.y_resolution,
 //                                    currX,currY-sweepWidth,currX,currY,rad)){
 //                                coveredSquares[i][j]=true;
@@ -135,7 +135,7 @@ public class Planner {
                     path.addAll(DroneMovement.moveTo(path.get(path.size()-1),new float[]{x_min+rad+dist,z_height,y_max-rad-dist}));
 //                    for (int j=(int)Math.floor((y_max-dist-sweepWidth)*sim.y_resolution/(y_max-y_min));j<(y_max-dist)*sim.y_resolution/(y_max-y_min);j++){
 //                        for(int i=(int)Math.floor((x_min+dist)*sim.x_resolution/(x_max-x_min));i<(x_max-dist)*sim.x_resolution/(x_max-x_min);i++){
-//                            if(OurUtils.isSquareCovered(i*(x_max-x_min)/sim.x_resolution,(j)*(y_max-y_min)/sim.y_resolution,
+//                            if(Utils.isSquareCovered(i*(x_max-x_min)/sim.x_resolution,(j)*(y_max-y_min)/sim.y_resolution,
 //                                    (i+1)*(x_max-x_min)/sim.x_resolution,(j+1)*(y_max-y_min)/sim.y_resolution,
 //                                    currX,currY-sweepWidth,currX,currY,rad)){
 //                                coveredSquares[i][j]=true;
@@ -147,7 +147,7 @@ public class Planner {
                     path.addAll(DroneMovement.moveTo(path.get(path.size()-1),new float[]{x_min+rad+dist,z_height,y_min+3*rad+dist}));
 //                    for (int j=(int)Math.floor((y_min+dist+sweepWidth)*sim.y_resolution/(y_max-y_min));j<(y_min+dist+sweepWidth)*sim.y_resolution/(y_max-y_min);j++){
 //                        for(int i=(int)Math.floor((x_min+dist)*sim.x_resolution/(x_max-x_min));i<(x_max-dist-sweepWidth)*sim.x_resolution/(x_max-x_min);i++){
-//                            if(OurUtils.isSquareCovered(i*(x_max-x_min)/sim.x_resolution,(j)*(y_max-y_min)/sim.y_resolution,
+//                            if(Utils.isSquareCovered(i*(x_max-x_min)/sim.x_resolution,(j)*(y_max-y_min)/sim.y_resolution,
 //                                    (i+1)*(x_max-x_min)/sim.x_resolution,(j+1)*(y_max-y_min)/sim.y_resolution,
 //                                    currX,currY-sweepWidth,currX,currY,rad)){
 //                                coveredSquares[i][j]=true;
@@ -175,7 +175,7 @@ public class Planner {
                     path.addAll(DroneMovement.moveTo(path.get(path.size()-1),new float[]{currX,z_height,currY}));
 //                    for (int j=(int)Math.floor((currY-sweepWidth/2)*sim.y_resolution/(y_max-y_min));j<(currY+sweepWidth/2)*sim.y_resolution/(y_max-y_min);j++){
 //                        for(int i=(int)Math.floor((currX-sweepWidth*3/2)*sim.x_resolution/(x_max-x_min));i<(currX+sweepWidth/2)*sim.x_resolution/(x_max-x_min);i++){
-//                            if(OurUtils.isSquareCovered(i*(x_max-x_min)/sim.x_resolution,(j)*(y_max-y_min)/sim.y_resolution,
+//                            if(Utils.isSquareCovered(i*(x_max-x_min)/sim.x_resolution,(j)*(y_max-y_min)/sim.y_resolution,
 //                                    (i+1)*(x_max-x_min)/sim.x_resolution,(j+1)*(y_max-y_min)/sim.y_resolution,
 //                                    x_min+rad,currY,x_max-rad,currY,rad)){
 //                                coveredSquares[i][j]=true;
@@ -191,7 +191,7 @@ public class Planner {
                         path.addAll(DroneMovement.moveTo(path.get(path.size()-1),new float[]{xy[0],z_height,xy[1]}));
 //                        for (int j=(int)Math.floor((xy[1]-sweepWidth/2)*sim.y_resolution/(y_max-y_min));j<(xy[1]+sweepWidth/2)*sim.y_resolution/(y_max-y_min);j++){
 //                            for(int i=(int)Math.floor((xy[0]-sweepWidth*3/2)*sim.x_resolution/(x_max-x_min));i<(xy[0]+sweepWidth/2)*sim.x_resolution/(x_max-x_min);i++){
-//                                if(OurUtils.isSquareInCircle(i*(x_max-x_min)/sim.x_resolution,(j)*(y_max-y_min)/sim.y_resolution,
+//                                if(Utils.isSquareInCircle(i*(x_max-x_min)/sim.x_resolution,(j)*(y_max-y_min)/sim.y_resolution,
 //                                        (i+1)*(x_max-x_min)/sim.x_resolution,(j+1)*(y_max-y_min)/sim.y_resolution,
 //                                        xy[0],xy[1],rad)){
 //                                    coveredSquares[i][j]=true;
